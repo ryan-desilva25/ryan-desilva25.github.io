@@ -11,6 +11,20 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		
+		<!-- Custom CSS Overrides to widen the dashboard presentation layer -->
+		<style>
+			/* Break Massively's narrow default container max-width limits for this page */
+			#wrapper, #main, .post {
+				max-width: 95% !important;
+				width: 95% !important;
+			}
+			/* Give the dashboard container extra horizontal stretching and crisp rendering boundaries */
+			.app-container {
+				width: 100% !important;
+				padding-bottom: 50% !important; /* Slightly reduced height ratio to balance out the ultra-wide layout */
+			}
+		</style>
 	</head>
 	<body class="is-preload">
 
