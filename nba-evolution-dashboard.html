@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>NBA Data Evolution | Ryan de Silva</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+				<header id="header">
+						<a href="index.html" class="logo">Portfolio Home</a>
+					</header>
+
+				<nav id="nav">
+						<ul class="links">
+							<li><a href="index.html">Featured Work</a></li>
+							<li class="active"><a href="#">NBA Evolution Study</a></li>
+							<li><a href="generic.html">About Me</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/ryan-de-silva-651341270" target="_blank" class="icon brands fa-linkedin"><span class="label">LinkedIn</span></a></li>
+							<li><a href="https://github.com/ryan-desilva25" target="_blank" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<div id="main">
+
+						<section class="post">
+								<header class="major">
+									<span class="date">R Shiny Interactive Narrative</span>
+									<h1>The Evolution of the NBA<br />
+									A 20-Year Data Study</h1>
+									<p>Investigating multi-million-row transactional shot logs, changing physical player archetypes, and league globalisation patterns using the 5DS storytelling framework.</p>
+								</header>
+
+								<hr />
+
+								<h2>Live Interactive Dashboard Platform</h2>
+								<p>Interact directly with the live serverless application deployment running below. Use the interface tabs to isolate shifting shot location densities, inspect changing height-weight clusters, or track international talent growth via interactive choropleths.</p>
+
+								<div class="app-container" style="position: relative; padding-bottom: 60%; height: 0; overflow: hidden; max-width: 100%; margin-bottom: 2.5rem; border: 2px solid #2e3440; border-radius: 6px;">
+									<iframe src="https://ryan-desilva25.shinyapps.io/YOUR-NBA-APP-NAME/" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allowfullscreen></iframe>
+								</div>
+
+								<hr />
+
+								<h2>Visualisation Architecture (Five Design Sheets Process)</h2>
+								<p>The system interface balances advanced exploratory data depth for professional scouts with clean visual storytelling layouts for sports analysts, structured around the <strong>Five Design Sheets (5DS) Framework</strong>:</p>
+								
+								<div class="row">
+									<div class="col-6 col-12-small">
+										<ul>
+											<li><strong>1. Discover:</strong> Explored 20 distinct visual idioms to map out patterns tracking shot density (spatial loc coordinates), age distributions, and international draft trends.</li>
+											<li><strong>2. Define:</strong> Established operational criteria for era bucketing and position groupings to isolate macro movements from background player variance noise.</li>
+											<li><strong>3. Design:</strong> Tested alternative grid layouts (Magazine vs. Interactive Dashboard formats), prioritizing sidebars to optimize cognitive load.</li>
+										</ul>
+									</div>
+									<div class="col-6 col-12-small">
+										<ul>
+											<li><strong>4. Develop:</strong> Deployed a cohesive interface using the 'Superhero' dark aesthetic, transparent chart layer configurations, and highly interactive Plotly/Leaflet render objects.</li>
+											<li><strong>5. Deliver:</strong> Created an optimized serverless asset delivery strategy powered by data pre-aggregation to maximize fast UI response.</li>
+										</ul>
+									</div>
+								</div>
+
+								<hr />
+
+								<h2>Data Pipeline & Engineering Execution</h2>
+								<p>Translating multiple dense data assets into a highly performant application layer required explicit data restructuring steps:</p>
+								<ul>
+									<li><strong>Ingestion & Schema Standardization:</strong> Consolidated 17 individual season shot-log CSV files into a unified dataset using <code>janitor::clean_names()</code>.</li>
+									<li><strong>Missing Value Imputation:</strong> Successfully resolved thousands of missing positional coordinates across season boundaries by performing categorical left-joins on player metadata keys.</li>
+									<li><strong>Geospatial Standardization:</strong> Unified international player origin naming conventions to align perfectly with Natural Earth map shapefiles, eliminating discrepancies across 15+ tracking regions.</li>
+									<li><strong>Performance Optimization:</strong> Engineered an automated ETL routine that pre-calculates analytical data matrices (e.g., historical True Shooting percentages, usage statistics, and geometric counts), reducing application load times down to sub-second responses.</li>
+								</ul>
+
+								<ul class="actions special">
+									<li><a href="https://github.com/ryan-desilva25" target="_blank" class="button large">View Code & R Scripts Repository</a></li>
+								</ul>
+							</section>
+
+					</div>
+
+				<footer id="footer">
+						<section class="split contact">
+							<section>
+								<h3>Location</h3>
+								<p>Victoria, Australia</p>
+							</section>
+							<section>
+								<h3>Socials</h3>
+								<ul class="icons alt">
+									<li><a href="https://www.linkedin.com/in/ryan-de-silva-651341270" target="_blank" class="icon brands alt fa-linkedin"><span class="label">LinkedIn</span></a></li>
+									<li><a href="https://github.com/ryan-desilva25" target="_blank" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+								</ul>
+							</section>
+						</section>
+					</footer>
+
+				<div id="copyright">
+						<ul><li>&copy; Ryan de Silva</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
