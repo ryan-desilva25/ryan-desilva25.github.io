@@ -14,27 +14,23 @@
 		
 		<!-- Custom CSS Overrides to widen the dashboard presentation layer -->
 		<style>
-			/* Force the main container structure to break out to the absolute edges */
+			/* Keep the main page wrapper at a standard, readable width for text */
 			#wrapper, #main {
-				max-width: 98% !important;
-				width: 98% !important;
-				padding: 2rem 1rem !important; /* Reduces large default side paddings */
+				max-width: 960px !important; /* Restores the original template text width */
+				width: 100% !important;
 			}
 
-			/* Remove generic post layout padding restriction just for the article body */
-			.post {
-				max-width: 100% !important;
-				width: 100% !important;
-				padding: 0 !important;
-			}
-			
-			/* Let the dashboard expand fully to the right margin */
+			/* Force ONLY the dashboard container to break out of the narrow text margins */
 			.app-container {
-				width: 100% !important;
+				width: 140% !important; /* Makes the dashboard 40% wider than the text column */
+				left: 50%;
+				transform: translateX(-50%); /* Centers the over-wide dashboard perfectly */
+				
 				padding-bottom: 80vh !important; 
 				position: relative;
 				height: 0;
 				overflow: hidden;
+				margin-top: 2.5rem;
 				margin-bottom: 2.5rem;
 				border: 2px solid #2e3440;
 				border-radius: 6px;
