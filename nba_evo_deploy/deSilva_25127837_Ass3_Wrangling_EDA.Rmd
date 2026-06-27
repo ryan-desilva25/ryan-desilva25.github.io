@@ -1,0 +1,710 @@
+---
+title: "Assessment 3 - Wrangling"
+output: html_document
+date: "2025-04-04"
+---
+
+```{r}
+# install.packages("shinythemes")
+
+library(readr)
+library(dplyr)
+library(purrr)
+library(janitor)
+library(lubridate)
+library(stringr)
+library(ggplot2)
+library(skimr)
+library(tidyverse)
+```
+
+
+
+Load all files in the directory
+```{r}
+
+all_seasons <- readr::read_csv("Data/all_seasons.csv")
+  
+shot_files <- list.files("Data/Player_Shots", pattern = "\\.csv$", full.names = TRUE)
+
+print(shot_files)
+
+
+# Confirm all shot files contain same columns
+
+column_names <- map(shot_files, ~ names(read_csv(.x, n_max = 0))) # read col names
+identical_cols <- all(map_lgl(column_names, ~ identical(column_names[[1]], .x))) # check if col names are same
+
+if (!identical_cols) {
+  print("Error: Column mismatch detected.")
+  column_names
+} else {
+  print("Success: No column mismatches.")
+}
+
+# Combine all shot data files into one main dataset
+shots_all <- shot_files %>%
+  map(read_csv) %>%
+  bind_rows()
+
+```
+
+## Data Cleaning
+
+```{r}
+# Standardise column names across datasets
+shots_all <- clean_names(shots_all)
+all_seasons <- clean_names(all_seasons)
+
+# Check data types
+glimpse(shots_all)
+
+# Remove trailing whitespaces before joining
+shots_all <- shots_all %>%
+  mutate(player_name = str_trim(player_name))
+
+# Convert game_date to date variable
+shots_all <- shots_all %>%
+  mutate(game_date = mdy(game_date))
+
+# Labels for quarters
+shots_all <- shots_all %>%
+  mutate(quarter_label = case_when(
+    quarter <= 4 ~ paste0("Q", quarter),
+    quarter == 5 ~ "OT1",
+    quarter == 6 ~ "OT2", 
+    quarter == 7 ~ "OT3",
+    quarter == 8 ~ "OT4",
+    TRUE ~ paste0("OT", quarter - 4)
+  ))
+
+# Convert min/sec fields to integers
+shots_all <- shots_all %>%
+  mutate(
+    mins_left = as.integer(mins_left),
+    secs_left = as.integer(secs_left)
+  )
+```
+
+Handle Missing Values
+```{r}
+colSums(is.na(shots_all))
+
+# Identified position_group data missing for 7930 rows
+```
+
+
+```{r}
+position_ref <- read_csv("Data/players.csv") %>%
+  clean_names() %>%
+  mutate(
+    player_name = paste(fname, lname)
+  ) %>%
+  select(player_name, position_ref = position)
+
+
+
+# Join position reference into main dataset for missing values
+shots_all <- shots_all %>%
+  left_join(position_ref, by = "player_name")
+
+# Fill in missing position groups
+shots_all <- shots_all %>%
+  mutate(
+    position_group = if_else(
+      is.na(position_group) & !is.na(position_ref), 
+      substr(position_ref, 1, 1), # Take first character eg. G for Guard, F for Forward-Guard, F for Forward
+      position_group # keep existing non-NA values
+    )
+  )
+
+# Clean up and remove position ref
+shots_all <- shots_all %>% select(-position_ref)
+
+# Add 5 year bins for help with EDA and visualisations
+shots_all <- shots_all %>%
+  mutate(
+    year_bin = cut(
+      season_1,
+      breaks = c(2004, 2009, 2014, 2019, 2025), # upper bound 2025 to include 2024
+      include.lowest = TRUE, 
+      right = FALSE, # left inclusive bins
+      labels = c("2004-2008", "2009-2013", "2014-2018", "2019-2024")
+    )
+  )
+
+shot_counts <- shots_all %>%
+  count(year_bin, shot_type)
+
+## Got missing values from 7930 to 4155
+```
+
+
+
+
+```{r}
+glimpse(all_seasons)
+
+# remove unnecessary index column
+all_seasons <- all_seasons %>%
+  select(-x1)
+
+all_seasons <- all_seasons %>% 
+  mutate(
+    draft_year = as.integer(na_if(draft_year, "Undrafted")),
+    draft_round = as.integer(na_if(draft_round, "Undrafted")),
+    draft_number = as.integer(na_if(draft_number, "Undrafted")), 
+    season_start = as.integer(substr(season, 1, 4)) # Extract start year
+  )
+
+# Create variable draft status & country group
+all_seasons <- all_seasons %>%
+  mutate(
+    draft_status = if_else(is.na(draft_year), "Undrafted", "Drafted"),
+    country_group = if_else(country == "USA", "USA", "International")
+  )
+
+# Remove trailing white space before joining
+
+all_seasons <- all_seasons %>%
+  mutate(player_name = str_trim(player_name))
+
+colSums(is.na(all_seasons))
+
+# Create new df to show career length for players
+career_lengths <- all_seasons %>% 
+  group_by(player_name) %>%
+  summarise(career_length = n_distinct(season_start))
+```
+
+
+## Merge datasets
+```{r}
+# Join career lengths to all seasons
+all_seasons <- all_seasons %>%
+  left_join(career_lengths, by = "player_name")
+
+# Create df for distinct player info
+player_info <- all_seasons %>%
+  group_by(player_name) %>%
+  summarise(
+    college = first(na.omit(college)),
+    country = first(na.omit(country)), 
+    draft_year = first(na.omit(draft_year)),
+    career_length = n_distinct(season_start),
+    draft_status = first(na.omit(draft_status)),
+    country_group = first(na.omit(country_group)),
+    .groups = "drop"
+  )
+
+# Ensure unqiue values before joining
+nrow(player_info) == length(unique(player_info$player_name)) # Return true then good to join
+
+# Join shots_all to all_seasons
+nba_data <- shots_all %>%
+  left_join(player_info, by = "player_name")
+
+
+# Export files
+write_csv(nba_data, "Data/nba_data.csv")
+write_csv(all_seasons, "Data/all_seasons_cleaned.csv")
+write_csv(player_info, "Data/player_info.csv")
+
+```
+
+
+
+# Exploratory Data Analysis (nba_data - shot_level)
+```{r}
+
+#  nba_data EDA
+skim(nba_data)
+colSums(is.na(nba_data))
+
+```
+
+```{r}
+# Shot Type breakdown
+ggplot(shot_counts, aes(x = year_bin, y = n, fill = shot_type)) + 
+  geom_col(position = "dodge") + 
+  labs(title = "Frequency of Shot Types", 
+       x = "Season Range",
+       y = "Shot Count",
+       fill = "Shot Type") +
+  theme_minimal()
+
+# Shot Distance Distribution
+ggplot(nba_data, aes(x = shot_distance)) +
+  geom_histogram(binwidth = 1, fill = "steelblue", colour = "white") + 
+  facet_wrap(~ year_bin) +
+  labs(title = "Shot Distance Distribution", 
+       x = "Shot Distance (feet)",
+       y = "Frequency") +
+  theme_minimal()
+
+# USA vs International Shot Style
+ggplot(subset(nba_data, !is.na(country_group)), aes(x = country_group, fill = shot_type)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) + 
+  labs(title = "Shot Type Distribution: USA vs. International",
+       x = "Country Group",
+       y = "Proportion",
+       fill = "Shot Type")
+
+# Shot Density by Position
+ggplot(nba_data, aes(x = loc_x, y = loc_y)) + 
+  geom_bin2d(bins = 40) + 
+  coord_fixed() + 
+  facet_wrap(~position_group) + 
+  labs(title = "Shot Density by Position Group")
+
+# Shot Distance by Height
+# ggplot(nba_data, aes(x = player_height, y = shot_distance) +
+#         geom_point(alpha = 0.2) + 
+#         geom_smooth(method = "lm", colour = "red") + 
+#         labs(title = "Shot Distance vs Player Height")
+       
+```
+
+# Exploratory Data Analysis (all seasons)
+```{r}
+skim(all_seasons)
+colSums(is.na(all_seasons))
+```
+```{r}
+# Season stat averages over time
+all_seasons %>%
+  group_by(season_start) %>%
+    summarise(
+      avg_pts = mean(pts, na.rm = TRUE),
+      avg_reb = mean(reb, na.rm = TRUE),
+      avg_ast = mean(ast, na.rm = TRUE),
+    ) %>%
+  pivot_longer(cols = starts_with("avg"), names_to = "stat", values_to = "value") %>%
+  ggplot(aes(x = season_start, y = value, colour = stat)) + 
+  geom_line(linewidth = 1) +
+  labs(title = "Average PTS, REB, AST Per Season")
+  
+
+# Summary table of key variables
+print(all_seasons %>% 
+  filter(season_start %in% c(2004, 2014, 2022)) %>%
+  group_by(season_start) %>%
+  summarise(
+    avg_height = mean(player_height, na.rm = TRUE),
+    avg_weight = mean(player_weight, na.rm = TRUE),
+    avg_age = mean(age, na.rm = TRUE),
+    avg_ts = mean(ts_pct, na.rm = TRUE),
+    avg_usg = mean(usg_pct, na.rm = TRUE),
+  ))
+
+# True Shooting Over Time
+all_seasons %>%
+  group_by(season_start) %>%
+  summarise(avg_ts = mean(ts_pct, na.rm = TRUE)) %>%
+  ggplot(aes(x = season_start, y = avg_ts)) +
+  geom_line(colour = "darkgreen") +
+  labs(title = "Average TS% By Season", y = "TS%")
+
+# Career Length Distribution
+ggplot(player_info, aes(x = career_length)) +
+  geom_histogram(binwidth = 1, fill = "purple") +
+  labs(title = "Distribution of Career Lengths")
+##### Compare veteran players over time? #####
+
+# 5 to 10 year comparison of USA vs International Players
+player_info %>%
+  filter(!is.na(country_group)) %>%
+  mutate(group = case_when(
+    career_length >= 10 ~ "10+ years",
+    career_length >= 5 ~ "5-9 years",
+    TRUE ~ NA_character_
+  ),
+  draft_bin = cut(
+    draft_year, 
+    breaks = seq(1980, 2025, by = 5), 
+    labels = paste(seq(1980, 2020, 5), seq(1984, 2024, 5), sep = "-"),
+    right = FALSE
+  )
+  ) %>%
+  filter(!is.na(group)) %>%
+  count(draft_bin, country_group, group) %>%
+  ggplot(aes(x = country_group, y = n, fill = group)) +
+  geom_col(position = "dodge") + 
+  facet_wrap(~ draft_bin) +
+  labs(
+    title = "Country Group of Veteran NBA Players Across Eras", 
+    x = "Country Group", 
+    y = "Count",
+    fill = "Career Length"
+  ) +
+  theme_minimal()
+### Add comment somewhere (only 5+ careers shown), also consider filtering NA and before 2019. 
+
+
+# Height vs. Weight Averages Across Seasons
+all_seasons %>%
+  filter(!is.na(player_height), !is.na(player_weight)) %>%
+  group_by(season_start) %>%
+  summarise(
+    avg_height = mean(player_height, na.rm = TRUE), 
+    avg_weight = mean(player_weight, na.rm = TRUE)
+  ) %>%
+  pivot_longer(cols = c(avg_height, avg_weight), 
+               names_to = "metric",
+               values_to = "value") %>%
+  ggplot(aes(x = factor(season_start), y = value, fill = metric)) +
+  geom_line(size = 1.2) + 
+  labs(
+    title = "Average Player Height vs. Weight By Season", 
+    x = "Season", 
+    y = "Value", 
+    fill = "Metric"
+  ) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
+
+
+```
+
+
+
+# Create files for dedicated visuals to reduce processing time
+```{r}
+
+# Physical trait dfs for archetype visuals
+player_phyiscal_traits <- all_seasons %>%
+  select(player_name, season_start, player_height, player_weight) %>%
+  distinct(player_name, season_start, .keep_all = TRUE) %>%
+  filter(!is.na(player_height), !is.na(player_weight))
+
+nba_joined <- nba_data %>%
+  left_join(player_phyiscal_traits, by = c("player_name", "season_1" = "season_start"))
+
+
+# Position group dfs for downstream use
+position_group_df <- nba_data %>%
+  select(season_1, player_name, position_group) %>%
+  distinct()
+
+# Remove 3 duplicates found
+position_group_df <- position_group_df %>%
+  filter(
+    !(player_name == "Chris Johnson" & season_1 == 2013 & position_group == "C"),
+    !(player_name == "Marcus Williams" & season_1 == 2008 & position_group == "G"),
+    !(player_name == "Marcus Williams" & season_1 == 2009 & position_group == "G")
+  )
+#duplicate_entries <- position_group_df %>%
+#  count(player_name, season_1) %>%
+#  filter(n > 1) 
+#view(duplicate_entries)
+
+
+# Visual 1 - Height vs. Shot Distance (animated scatter)
+player_archetypes_scatter_data <- nba_joined %>%
+  filter(
+    !is.na(season_1),
+    !is.na(player_height),
+    !is.na(shot_distance),
+    !is.na(position_group)
+  )
+
+player_archetypes_scatter <- player_archetypes_scatter_data %>%
+  group_by(season_1, position_group) %>%
+  summarise(
+    avg_height = mean(player_height, na.rm = TRUE),
+    avg_shot_dist = mean(shot_distance, na.rm = TRUE), 
+    .groups = "drop"
+  ) %>%
+  arrange(season_1, position_group)
+
+write_csv(player_archetypes_scatter, "Data/Processed/player_archetypes_scatter.csv")
+
+
+# Visual 2 - Shot Type Composition by Season (2PT vs 3PT)
+shot_type_composition <- nba_data %>%
+  group_by(season_1, shot_type) %>%
+  summarise(shot_count = n(), .groups = "drop")
+write_csv(shot_type_composition, "Data/Processed/shot_type_composition.csv")
+
+
+# Visual 3 - League TS% Over Time 
+ts_percentages <- all_seasons %>%
+  filter(!is.na(ts_pct), !is.na(country_group)) %>%
+  group_by(season_start, country_group) %>%
+  summarise(ts_pct = mean(ts_pct, na.rm = TRUE), .groups = "drop")
+  
+  
+league_avg_ts <- all_seasons %>% # league TS% averages
+  group_by(season_start) %>%
+  summarise(ts_pct = mean(ts_pct), .groups = "drop") %>%
+  mutate(country_group = "All")
+
+ts_percentages <- bind_rows(ts_percentages, league_avg_ts) # merge together
+ts_percentages <- ts_percentages %>% 
+  arrange(season_start, country_group # order data
+          )
+
+write_csv(ts_percentages, "Data/Processed/ts_percentages.csv")
+
+# Visual 4 - Usage Across Positions Over Time
+usage_positions_df <- all_seasons %>%
+  left_join(
+    position_group_df, 
+    by = c("player_name", "season_start" = "season_1")
+  )
+
+usage_positions_df_clean <- usage_positions_df %>%
+  select(season_start, player_name, position_group, usg_pct) %>%
+  filter(!is.na(position_group), !is.na(usg_pct), !is.na(season_start))
+ 
+usage_percentages <- usage_positions_df_clean %>%
+  filter(!is.na(usg_pct), !is.na(position_group)) %>%
+  group_by(season_start, position_group) %>%
+  summarise(usg_pct = mean(usg_pct, na.rm = TRUE), .groups = "drop")
+  
+  
+league_avg_usg <- usage_positions_df_clean %>% # league usg% averages
+  group_by(season_start) %>%
+  summarise(usg_pct = mean(usg_pct), .groups = "drop") %>%
+  mutate(position_group = "All")
+
+usage_percentages <- bind_rows(usage_percentages, league_avg_usg) # merge together
+usage_percentages <- usage_percentages %>% 
+  arrange(season_start, position_group)
+
+write_csv(usage_percentages, "Data/Processed/usage_percentages.csv")
+
+# Visual 5 - Physical Profile by Position
+height_weight_by_position <- nba_joined %>%
+  filter(
+    !is.na(season_1),
+    !is.na(player_height),
+    !is.na(player_weight),
+    !is.na(position_group)
+  )
+
+player_builds_violin_plot <- height_weight_by_position %>%
+  group_by(season_1, position_group) %>%
+  summarise(
+    avg_height = mean(player_height, na.rm = TRUE),
+    avg_weight = mean(player_weight, na.rm = TRUE), 
+    .groups = "drop"
+  ) %>%
+  arrange(season_1, position_group)
+
+write_csv(player_builds_violin_plot, "Data/Processed/player_builds_violin_plot.csv")
+
+
+# Visual 6 - Average Age Demographic of League
+avg_age_per_season <- all_seasons %>%
+  group_by(season_start) %>%
+  summarise(
+    avg_age = mean(age, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  select(season_start, avg_age)
+
+write_csv(avg_age_per_season, "Data/Processed/avg_age_per_season.csv")
+
+# Visual 7 - Career Length 
+career_band_player_info <- player_info %>%
+  mutate(
+    career_band = case_when(
+      career_length < 5 ~ "0-4 years",
+      career_length < 10 ~ "5-9 years",
+      TRUE ~ "10+ years"
+    )
+  )
+
+career_length_country_draft <- career_band_player_info %>%
+  filter(
+    !is.na(career_length),
+    !is.na(country_group), 
+    !is.na(draft_status), 
+    !is.na(career_band)
+  ) %>%
+  group_by(country_group, career_band) %>%
+  summarise(
+    total_in_band = n(), 
+    drafted = sum(draft_status == "Drafted", na.rm = TRUE),
+    undrafted = sum(draft_status == "Undrafted", na.rm = TRUE),
+    .groups = "drop" 
+  ) %>%
+  group_by(country_group) %>%
+  mutate(
+    total_country_players = sum(total_in_band),
+    country_pct = total_in_band / total_country_players
+  ) %>%
+  ungroup() %>%
+  select(country_group, career_band, total_in_band, country_pct, drafted, undrafted)
+
+write_csv(career_length_country_draft, "Data/Processed/career_length_country_draft.csv")
+
+
+# Visual 8 - International Players Over Time
+intl_representation <- all_seasons %>%
+  group_by(season_start, country_group) %>%
+  summarise(player_count = n(), .groups = "drop") %>%
+  select(season_start, country_group, player_count)
+
+write_csv(intl_representation, "Data/Processed/intl_representation.csv")
+  
+
+# Visual 9 - Player Origin Map
+player_origins_season <- all_seasons %>%
+  filter(!is.na(season_start), !is.na(country)) %>%
+  group_by(season_start, country) %>%
+  summarise(player_count = n(), .groups = "drop") %>%
+  mutate(view = "Seasonal")
+
+player_origins_season <- player_origins_season %>%
+  mutate(season_start = as.character(season_start))
+
+player_origins_overall <- all_seasons %>% 
+  filter(!is.na(country)) %>%
+  group_by(country) %>%
+  summarise(player_count = n(), .groups = "drop") %>%
+  mutate(season_start = "All", view = "Overall")
+
+player_origins_map <- bind_rows(player_origins_season, player_origins_overall) %>% # merge together
+  select(season_start, country, player_count, view) %>% 
+  arrange(season_start, desc(player_count) # order data
+          )
+
+# Distinct countries
+#player_origins_map_distinct <- player_origins_map %>%
+#  distinct(country) %>%
+#  arrange(country)
+
+# Clean names to make compatible with natural earth.
+player_origins_map <- player_origins_map %>%
+  mutate(country = recode(country, 
+                          "USA" = "United States of America",
+                          "US Virgin Islands" = "United States Virgin Islands",
+                          "U.S. Virgin Islands" = "United States Virgin Islands",
+                          "Great Britain" = "United Kingdom",
+                          "England" = "United Kingdom",
+                          "Scotland" = "United Kingdom",
+                          "Republic of the Congo" = "Congo",
+                          "DRC" = "Democratic Republic of the Congo",
+                          "Czech Republic" = "Czechia",
+                          "Macedonia" = "North Macedonia",
+                          "Russia" = "Russian Federation",
+                          "Iran" = "Iran (Islamic Republic of)",
+                          "South Korea" = "Korea, Republic of",
+                          "Tanzania" = "United Republic of Tanzania",
+                          "St. Vincent & Grenadines" = "St. Vincent and the Grenadines",
+                          "Saint Lucia" = "St. Lucia", 
+                          "Bosnia & Herzegovina" = "Bosnia and Herzegovina",
+                          "Bosnia" = "Bosnia and Herzegovina",
+                          "Serbia and Montenegro" = "Serbia",
+                          "Yugoslavia" = "Serbia",
+                          "USSR" = "Russia"
+                          ))
+
+write_csv(player_origins_map, "Data/Processed/player_origins_map.csv")
+
+# Visual test - Player Physicals Raw
+player_physical_raw <- nba_joined %>%
+  filter(!is.na(player_height), !is.na(player_weight), !is.na(season_1), !is.na(position_group)) %>%
+  select(season_1, position_group, player_height, player_weight)
+write_csv(player_physical_raw, "Data/Processed/player_physical_raw.csv")
+
+
+# Visual test 2 - physical IQR ranges
+height_summary_stats <- player_physical_raw %>%
+  group_by(season_1, position_group) %>%
+  summarise(
+    Q1 = quantile(player_height, 0.25, na.rm = TRUE), 
+    Median = median(player_height, na.rm = TRUE), 
+    Q3 = quantile(player_height, 0.75, na.rm = TRUE), 
+    Min = min(player_height, na.rm = TRUE), 
+    Max = max(player_height, na.rm = TRUE),
+    .groups = "drop"
+  )
+write_csv(height_summary_stats, "Data/Processed/height_summary_stats.csv")
+
+weight_summary_stats <- player_physical_raw %>%
+  group_by(season_1, position_group) %>%
+  summarise(
+    Q1 = quantile(player_weight, 0.25, na.rm = TRUE), 
+    Median = median(player_weight, na.rm = TRUE), 
+    Q3 = quantile(player_weight, 0.75, na.rm = TRUE), 
+    Min = min(player_weight, na.rm = TRUE), 
+    Max = max(player_weight, na.rm = TRUE),
+    .groups = "drop"
+  )
+write_csv(weight_summary_stats, "Data/Processed/weight_summary_stats.csv")
+```
+# Additional EDA After file creation
+```{r}
+# Height vs. Shot Distance
+ggplot(nba_joined, aes(x = player_height, y = shot_distance)) + 
+  geom_point(alpha = 0.2, colour = "#4AB1F1") + 
+  geom_smooth(method = "lm", se = FALSE, colour = "#e76f51") + 
+  labs(title = "Shot Distance vs Player Height", 
+       x = "Player Height (cm)", 
+       y = "Shot Distance (feet)")
+
+# Table of top countries
+all_seasons %>%
+  group_by(country) %>%
+  summarise(player_count = n()) %>%
+  arrange(desc(player_count)) %>%
+  head(10)
+
+
+# Distribution of Age by Era
+all_seasons %>%
+  mutate(year_group = cut(season_start, breaks = c(2000, 2010, 2020, 2025))) %>%
+  ggplot(aes(x = age, fill = year_group)) + 
+  geom_density(alpha = 0.5) + 
+  labs(title = "Distribution of Players by Age")
+```
+
+
+
+### Explore trends of undrafted players by checking NA vs. values
+### Play around with joining inner, and both lefts
+
+# Visual 1 - shot distance trends
+
+nba_data_shot_dist_clean <- nba_data %>%
+  filter(!is.na(season_1), !is.na(shot_distance), !is.na(position_group))
+
+shot_distance_trends <- nba_data_shot_dist_clean %>% # position averages
+  group_by(season_1, position_group) %>%
+  summarise(avg_shot_distance = mean(shot_distance, na.rm = TRUE), .groups = "drop")
+
+league_avg_shots <- nba_data_shot_dist_clean %>% # league averages
+  group_by(season_1) %>%
+  summarise(avg_shot_distance = mean(shot_distance), .groups = "drop") %>%
+  mutate(position_group = "All")
+
+shot_distance_trends <- bind_rows(shot_distance_trends, league_avg_shots) # merge together
+shot_distance_trends <- shot_distance_trends %>% 
+  arrange(season_1, position_group # order data
+          )
+write_csv(shot_distance_trends, "Data/Processed/shot_distance_trends.csv")
+
+
+
+
+career_length_country_draft <- career_band_player_info %>%
+  filter(
+    !is.na(career_length),
+    !is.na(country_group), 
+    !is.na(draft_status), 
+    !is.na(career_band)
+  ) %>%
+  group_by(country_group, draft_status, career_band) %>%
+  summarise(
+    avg_career_length = mean(career_length, na.rm = TRUE), 
+    player_count = n(),
+    .groups = "drop"
+  )

@@ -1,0 +1,7 @@
+country_group,career_band,total_in_band,country_pct,drafted,undrafted
+International,0-4 years,234,0.5679611650485437,142,92
+International,10+ years,74,0.1796116504854369,70,4
+International,5-9 years,104,0.2524271844660194,84,20
+USA,0-4 years,1256,0.587190275829827,726,530
+USA,10+ years,362,0.16923796166432914,326,36
+USA,5-9 years,521,0.24357176250584386,429,92
