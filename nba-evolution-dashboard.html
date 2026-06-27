@@ -14,26 +14,33 @@
 		
 		<!-- Custom CSS Overrides to widen the dashboard presentation layer -->
 		<style>
-			/* Widen the portfolio page content area to fill the screen horizontally */
-			#wrapper, #main, .post {
-				max-width: 95% !important;
-				width: 95% !important;
+			/* Force the main container structure to break out to the absolute edges */
+			#wrapper, #main {
+				max-width: 98% !important;
+				width: 98% !important;
+				padding: 2rem 1rem !important; /* Reduces large default side paddings */
+			}
+
+			/* Remove generic post layout padding restriction just for the article body */
+			.post {
+				max-width: 100% !important;
+				width: 100% !important;
+				padding: 0 !important;
 			}
 			
-			/* Expand the app container vertically to match standard screen dimensions */
+			/* Let the dashboard expand fully to the right margin */
 			.app-container {
 				width: 100% !important;
-				padding-bottom: 80vh !important; /* Raised from 55vh to 80vh for a spacious desktop layout */
+				padding-bottom: 80vh !important; 
 				position: relative;
 				height: 0;
 				overflow: hidden;
 				margin-bottom: 2.5rem;
 				border: 2px solid #2e3440;
 				border-radius: 6px;
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Adds a clean, professional shadow depth */
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 			}
 			
-			/* Force the iframe to occupy the full expanded dimensions */
 			.app-container iframe {
 				position: absolute;
 				top: 0;
