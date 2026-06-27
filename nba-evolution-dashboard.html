@@ -14,22 +14,26 @@
 		
 		<!-- Custom CSS Overrides to widen the dashboard presentation layer -->
 		<style>
-			/* Widen the portfolio page content area */
+			/* Widen the portfolio page content area to fill the screen horizontally */
 			#wrapper, #main, .post {
 				max-width: 95% !important;
 				width: 95% !important;
 			}
 			
-			/* Make the app container fill the space */
+			/* Expand the app container vertically to match standard screen dimensions */
 			.app-container {
 				width: 100% !important;
-				padding-bottom: 55vh !important; /* Forces a fixed height based on 55% of the viewport height */
+				padding-bottom: 80vh !important; /* Raised from 55vh to 80vh for a spacious desktop layout */
 				position: relative;
 				height: 0;
 				overflow: hidden;
+				margin-bottom: 2.5rem;
+				border: 2px solid #2e3440;
+				border-radius: 6px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Adds a clean, professional shadow depth */
 			}
 			
-			/* Force the iframe to occupy the full dimensions of the container */
+			/* Force the iframe to occupy the full expanded dimensions */
 			.app-container iframe {
 				position: absolute;
 				top: 0;
