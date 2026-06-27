@@ -14,32 +14,33 @@
 		
 		<!-- Custom CSS Overrides to widen the dashboard presentation layer -->
 		<style>
-			/* Keep the core text column standard, neat, and highly readable */
+			/* Force the main container structure to break out to the absolute edges */
 			#wrapper, #main {
-				max-width: 960px !important;
-				width: 100% !important;
+				max-width: 98% !important;
+				width: 98% !important;
+				padding: 2rem 1rem !important; /* Reduces large default side paddings */
 			}
 
-			/* Force ONLY the dashboard window to break its margins and span perfectly wide */
+			/* Remove generic post layout padding restriction just for the article body */
+			.post {
+				max-width: 100% !important;
+				width: 100% !important;
+				padding: 0 !important;
+			}
+			
+			/* Let the dashboard expand fully to the right margin */
 			.app-container {
-				position: relative;
-				/* Calculates the exact physical width of the viewport and stretches to 90% of it */
-				width: 90vw !important; 
-				
-				/* Dynamically centers the over-wide box relative to the 960px text column above it */
-				left: calc(-45vw + 50%); 
-				
+				width: 100% !important;
 				padding-bottom: 80vh !important; 
+				position: relative;
 				height: 0;
 				overflow: hidden;
-				margin-top: 3rem;
-				margin-bottom: 3rem;
+				margin-bottom: 2.5rem;
 				border: 2px solid #2e3440;
 				border-radius: 6px;
 				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 			}
 			
-			/* Ensure the Shiny server frame mirrors the container bounds precisely */
 			.app-container iframe {
 				position: absolute;
 				top: 0;
