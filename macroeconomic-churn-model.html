@@ -1,1 +1,163 @@
 
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Macroeconomic Churn Model | Ryan de Silva</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<div id="wrapper">
+
+				<header id="header">
+						<a href="index.html" class="logo">Portfolio</a>
+					</header>
+
+				<nav id="nav">
+						<ul class="links">
+							<li class="active"><a href="index.html">Featured Work</a></li>
+							<li><a href="generic.html">About Me</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/ryan-de-silva-651341270" target="_blank" class="icon brands fa-linkedin"><span class="label">LinkedIn</span></a></li>
+							<li><a href="https://github.com/ryan-desilva25" target="_blank" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<div id="main">
+
+						<section class="post">
+								<header class="major">
+									<span class="date">Machine Learning & Risk Project</span>
+									<h1>Macroeconomic Drivers of<br />
+									Consumer Banking Attrition</h1>
+									<p>An end-to-end predictive risk framework integrating consumer banking activity profiles with external macroeconomic stressors to isolate high-risk customer cohorts under economic volatility.</p>
+								</header>
+
+								<h2>Executive Summary</h2>
+								<p>Traditional churn models function within a vacuum, isolating customer behavioral patterns without adjusting for external macroeconomic variables. This case study addresses that gap by enriching classic customer metrics with real-world financial stressors—specifically, linear-interpolated national average wage indexes and localized Cost of Living (CPI) parameters—to model consumer "Purchasing Power" constraints. By benchmarking multiple predictive architectures, an optimized <strong>XGBoost</strong> model was selected as the champion framework, achieving a <strong>71% Target Recall</strong> on the minority churn class.</p>
+								
+								<div class="row">
+									<div class="col-12">
+										<ul class="actions">
+											<li><a href="https://github.com/ryan-desilva25/macroeconomic-churn-model" target="_blank" class="button primary icon brands fa-github">View Full GitHub Repository</a></li>
+										</ul>
+									</div>
+								</div>
+
+								<hr />
+
+								<h2>1. Architecture Benchmarking & Metric Optimization</h2>
+								<p>Because failing to flag an shifting customer results in an asymmetrical financial loss to a bank's balance sheet, maximizing <strong>Recall for the minority churn class</strong> was prioritized over raw global accuracy. The modeling pipeline evaluated a baseline parametric model (Logistic Regression), a bagging ensemble (Random Forest), and a gradient-boosted tree (XGBoost) using native cost-sensitive adjustments (such as <code>scale_pos_weight</code>) to correct for the steep 80/20 class imbalance.</p>
+
+								<div class="table-wrapper">
+									<table>
+										<thead>
+											<tr>
+												<th>Model Architecture</th>
+												<th>Target Recall (Class 1)</th>
+												<th>Target Precision (Class 1)</th>
+												<th>Global Accuracy</th>
+												<th>ROC-AUC</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>Logistic Regression</td>
+												<td>71%</td>
+												<td>39%</td>
+												<td>71%</td>
+												<td>0.7762</td>
+											</tr>
+											<tr>
+												<td>Random Forest</td>
+												<td>55%</td>
+												<td>66%</td>
+												<td><strong>85%</strong></td>
+												<td><strong>0.8562</strong></td>
+											</tr>
+											<tr style="font-weight: bold; background-color: rgba(0,0,0,0.025);">
+												<td>XGBoost (Champion)</td>
+												<td><strong>71%</strong></td>
+												<td><strong>52%</strong></td>
+												<td><strong>81%</strong></td>
+												<td><strong>0.8537</strong></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+
+								<p>While the Random Forest architecture yielded an impressive global accuracy, it ultimately failed the core risk parameter, missing 45% of actual attrition events. XGBoost struck the optimal commercial threshold, capturing 71% of churning customers while maintaining a significantly tighter precision boundary (52%) relative to the high-noise linear baseline.</p>
+
+								<div class="image main">
+									<img src="images/roc-curve-comparison.png" alt="ROC Curve Performance Comparison Chart" />
+									<p style="text-align: center; font-style: italic; font-size: 0.85rem; margin-top: 0.5rem;">Figure 1: ROC Curve space validation across candidate modeling pipelines.</p>
+								</div>
+
+								<hr />
+
+								<h2>2. Feature Engineering & Macroeconomic Transmission</h2>
+								<p>A continuous macroeconomic historical timeline (2010–2026) was reconstructed from wide-format national wage datasets using linear interpolation and automated CAGR projection metrics. Customer profiles were then matched against historical baselines according to their unique tenure cohorts to extract a normalized <code>purchasing_power_index</code>.</p>
+
+								<div class="image main">
+									<img src="images/xgboost-feature-importance.png" alt="XGBoost Feature Importance Gini Score Plot" />
+									<p style="text-align: center; font-style: italic; font-size: 0.85rem; margin-top: 0.5rem;">Figure 2: Information gain metrics isolating the global drivers of customer attrition.</p>
+								</div>
+
+								<p>Extracting the global feature importance rankings reveals that external financial indicators act as critical transmission channels for consumer flight. When localized living costs inflate, customer disposable cash buffers compress, driving immediate sensitivity towards competitor pricing parameters and product runoff.</p>
+
+								<hr />
+
+								<h2>3. Financial Strategic Impact</h2>
+								<p>To translate raw classification performance into quantifiable revenue management, the holdout confusion matrix outputs were passed into a strategic balance sheet simulation utilizing industry-standard retail banking parameters:</p>
+								
+								<ul>
+									<li><strong>Average Annual Account Asset Value:</strong> $500</li>
+									<li><strong>Proactive Retention Offer Unit Cost:</strong> $100</li>
+									<li><strong>Targeted Incentive Conversion Rate:</strong> 50%</li>
+								</ul>
+
+								<p>By leveraging XGBoost to capture risk groups proactively rather than reacting post-attrition, the framework minimizes costly False Negatives. The marginal operational cost of distributing loyalty discounts to False Positive accounts is structurally outweighed by the capital assets protected, generating significant net portfolio value over baseline strategies.</p>
+
+							</section>
+					</div>
+
+				<footer id="footer">
+						<section class="split contact">
+							<section>
+								<h3>Location</h3>
+								<p>Victoria, Australia</p>
+							</section>
+							<section>
+								<h3>Email</h3>
+								<p><a href="mailto:ryan.desilva@example.com">ryan.desilva@example.com</a></p>
+							</section>
+							<section>
+								<h3>Socials</h3>
+								<ul class="icons alt">
+									<li><a href="https://www.linkedin.com/in/ryan-de-silva-651341270" target="_blank" class="icon brands alt fa-linkedin"><span class="label">LinkedIn</span></a></li>
+									<li><a href="https://github.com/ryan-desilva25" target="_blank" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+								</ul>
+							</section>
+						</section>
+					</footer>
+
+				<div id="copyright">
+						<ul><li>&copy; Ryan de Silva</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
