@@ -1,9 +1,4 @@
 <!DOCTYPE HTML>
-<!--
-	Massively by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html>
 	<head>
 		<title>NBA Data Evolution | Ryan de Silva</title>
@@ -12,13 +7,16 @@
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 		
-		<!-- Custom CSS Overrides to widen the dashboard presentation layer -->
 		<style>
 			/* Force the main container structure to break out to the absolute edges */
 			#wrapper, #main {
 				max-width: 98% !important;
 				width: 98% !important;
-				padding: 2rem 1rem !important; /* Reduces large default side paddings */
+			}
+
+			/* Fixes the text overlap by adding defensive spacing below the navbar */
+			#main {
+				padding: 5rem 1rem 2rem 1rem !important;
 			}
 
 			/* Remove generic post layout padding restriction just for the article body */
@@ -73,7 +71,7 @@
 
 				<div id="main">
 
-						<section class="post">
+						<article class="post">
 								<header class="major">
 									<span class="date">Interactive Analytics Platform</span>
 									<h1>The Evolution of the NBA<br />
@@ -81,6 +79,26 @@
 									<p>An interactive, full-stack data storytelling application mapping spatial mechanics, shifting physical player archetypes, and global talent pipelines from 2004 to the modern era.</p>
 								</header>
 
+								<div class="row" style="margin-bottom: 2rem;">
+									<div class="col-6 col-12-small">
+										<h4 style="margin-bottom: 0.5rem; color: #f2849e;"><i class="icon solid fa-cogs"></i> Core Data Engineering (R)</h4>
+										<ul style="list-style-type: none; padding-left: 0; margin-left: 0; line-height: 1.6;">
+											<li><strong>Pipeline Operations:</strong> <code>tidyverse</code>, <code>dplyr</code>, <code>purrr</code></li>
+											<li><strong>Data Cleansing:</strong> <code>janitor</code>, <code>stringr</code>, <code>lubridate</code></li>
+											<li><strong>Ingestion & Auditing:</strong> <code>readr</code>, <code>skimr</code></li>
+										</ul>
+									</div>
+									<div class="col-6 col-12-small">
+										<h4 style="margin-bottom: 0.5rem; color: #18bfef;"><i class="icon solid fa-desktop"></i> Interactive BI Engine (R Shiny)</h4>
+										<ul style="list-style-type: none; padding-left: 0; margin-left: 0; line-height: 1.6;">
+											<li><strong>UI Architecture:</strong> <code>shiny</code>, <code>shinythemes</code></li>
+											<li><strong>Spatial & Mapping Layers:</strong> <code>leaflet</code>, <code>sf</code>, <code>rnaturalearth</code></li>
+											<li><strong>Data Graphics:</strong> <code>plotly</code>, <code>ggplot2</code></li>
+										</ul>
+									</div>
+								</div>
+								<hr />
+							
 								<h2>Project Overview & Executive Summary</h2>
 								<p>Modern sports analytics faces a distinct data volume challenge: translating millions of granular, spatial performance rows into actionable tactical insights. This project builds a performant, end-to-end data pipeline and visual intelligence engine to solve that problem. By aggregating multi-source event-level shot logs and player demographic datasets, this platform isolates the mechanical shifts of the "Three-Point Revolution," clusters changing body-type distributions, and tracks the rise of international talent over a two-decade timeline.</p>
 
@@ -128,7 +146,7 @@
 								<ul class="actions special">
 									<li><a href="https://github.com/ryan-desilva25" target="_blank" class="button large">View Code & Production R Scripts</a></li>
 								</ul>
-							</section>
+							</article>
 
 					</div>
 
