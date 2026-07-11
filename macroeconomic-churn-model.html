@@ -6,6 +6,26 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		
+		<style>
+			/* Force the main container structure to break out to the absolute edges */
+			#wrapper, #main {
+				max-width: 98% !important;
+				width: 98% !important;
+			}
+
+			/* Fixes the text overlap by adding defensive spacing below the navbar */
+			#main {
+				padding: 5rem 1rem 2rem 1rem !important;
+			}
+
+			/* Remove generic post layout padding restriction just for the article body */
+			.post {
+				max-width: 100% !important;
+				width: 100% !important;
+				padding: 0 !important;
+			}
+		</style>
 	</head>
 	<body class="is-preload">
 
@@ -29,13 +49,33 @@
 
 				<div id="main">
 
-						<section class="post">
+						<article class="post">
 								<header class="major">
 									<span class="date">Machine Learning & Risk Project</span>
 									<h1>Macroeconomic Drivers of<br />
 									Consumer Banking Attrition</h1>
 									<p>An end-to-end predictive risk framework integrating consumer banking activity profiles with external macroeconomic stressors to isolate high-risk customer cohorts under economic volatility.</p>
 								</header>
+
+								<div class="row" style="margin-bottom: 2rem;">
+									<div class="col-6 col-12-small">
+										<h4 style="margin-bottom: 0.5rem; color: #f2849e;"><i class="icon solid fa-brain"></i> Predictive Modeling & ML (Python 3.11)</h4>
+										<ul style="list-style-type: none; padding-left: 0; margin-left: 0; line-height: 1.6;">
+											<li><strong>Champion Architecture:</strong> <code>XGBoost (XGBClassifier)</code></li>
+											<li><strong>Ensemble Benchmarking:</strong> <code>RandomForestClassifier</code>, <code>LogisticRegression</code></li>
+											<li><strong>Evaluation Frameworks:</strong> <code>classification_report</code>, <code>confusion_matrix</code>, <code>roc_curve</code>, <code>roc_auc_score</code></li>
+										</ul>
+									</div>
+									<div class="col-6 col-12-small">
+										<h4 style="margin-bottom: 0.5rem; color: #18bfef;"><i class="icon solid fa-database"></i> Feature Processing & Ingestion</h4>
+										<ul style="list-style-type: none; padding-left: 0; margin-left: 0; line-height: 1.6;">
+											<li><strong>Data Transformation:</strong> <code>Pipeline</code>, <code>ColumnTransformer</code>, <code>train_test_split</code></li>
+											<li><strong>Feature Engineering:</strong> <code>OneHotEncoder</code>, <code>StandardScaler</code></li>
+											<li><strong>Analytics Foundations:</strong> <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>seaborn</code></li>
+										</ul>
+									</div>
+								</div>
+								<hr />
 
 								<h2>Executive Summary</h2>
 								<p>Traditional churn models function within a vacuum, isolating customer behavioural patterns without adjusting for external macroeconomic variables. This case study addresses that gap by enriching classic customer metrics with real-world financial stressors—specifically, linear-interpolated national average wage indexes and localised Cost of Living (CPI) parameters—to model consumer "Purchasing Power" constraints. By benchmarking multiple predictive architectures, an optimised <strong>XGBoost</strong> model was selected as the champion framework, achieving a <strong>71% Target Recall</strong> on the minority churn class.</p>
@@ -123,7 +163,7 @@
 
 								<p>By leveraging XGBoost to capture risk groups proactively rather than reacting post-attrition, the framework minimises costly False Negatives. The marginal operational cost of distributing loyalty discounts to False Positive accounts is structurally outweighed by the capital assets protected, generating significant net portfolio value over baseline strategies.</p>
 
-							</section>
+							</article>
 					</div>
 
 				<footer id="footer">
@@ -143,18 +183,4 @@
 					</footer>
 
 				<div id="copyright">
-						<ul><li>&copy; Ryan de Silva</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
-					</div>
-
-			</div>
-
-		<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.scrollex.min.js"></script>
-			<script src="assets/js/jquery.scrolly.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
-
-	</body>
-</html>
+						<ul><li>&
