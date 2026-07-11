@@ -1,4 +1,3 @@
-
 <!DOCTYPE HTML>
 <html>
 	<head>
@@ -38,12 +37,13 @@
 								</header>
 
 								<h2>Executive Summary</h2>
-								<p>Traditional churn models function within a vacuum, isolating customer behavioral patterns without adjusting for external macroeconomic variables. This case study addresses that gap by enriching classic customer metrics with real-world financial stressors—specifically, linear-interpolated national average wage indexes and localized Cost of Living (CPI) parameters—to model consumer "Purchasing Power" constraints. By benchmarking multiple predictive architectures, an optimized <strong>XGBoost</strong> model was selected as the champion framework, achieving a <strong>71% Target Recall</strong> on the minority churn class.</p>
+								<p>Traditional churn models function within a vacuum, isolating customer behavioural patterns without adjusting for external macroeconomic variables. This case study addresses that gap by enriching classic customer metrics with real-world financial stressors—specifically, linear-interpolated national average wage indexes and localised Cost of Living (CPI) parameters—to model consumer "Purchasing Power" constraints. By benchmarking multiple predictive architectures, an optimised <strong>XGBoost</strong> model was selected as the champion framework, achieving a <strong>71% Target Recall</strong> on the minority churn class.</p>
 								
 								<div class="row">
 									<div class="col-12">
 										<ul class="actions">
-											<li><a href="https://github.com/ryan-desilva25/macroeconomic-churn-model" target="_blank" class="button primary icon brands fa-github">View Full GitHub Repository</a></li>
+											<li><a href="project.html" class="button primary icon solid fa-file-alt">Read Documentation Page</a></li>
+											<li><a href="Churn_Project.ipynb" target="_blank" class="button icon brands fa-github">View Jupyter Notebook Code</a></li>
 										</ul>
 									</div>
 								</div>
@@ -51,7 +51,7 @@
 								<hr />
 
 								<h2>1. Architecture Benchmarking & Metric Optimization</h2>
-								<p>Because failing to flag an shifting customer results in an asymmetrical financial loss to a bank's balance sheet, maximizing <strong>Recall for the minority churn class</strong> was prioritized over raw global accuracy. The modeling pipeline evaluated a baseline parametric model (Logistic Regression), a bagging ensemble (Random Forest), and a gradient-boosted tree (XGBoost) using native cost-sensitive adjustments (such as <code>scale_pos_weight</code>) to correct for the steep 80/20 class imbalance.</p>
+								<p>Because failing to flag a shifting customer results in an asymmetrical financial loss to a bank's balance sheet, maximising <strong>Recall for the minority churn class</strong> was prioritised over raw global accuracy. The modelling pipeline evaluated a baseline parametric model (Logistic Regression), a bagging ensemble (Random Forest), and a gradient-boosted tree (XGBoost) using native cost-sensitive adjustments (such as <code>scale_pos_weight</code>) to correct for the steep 80/20 class imbalance.</p>
 
 								<div class="table-wrapper">
 									<table>
@@ -93,26 +93,26 @@
 								<p>While the Random Forest architecture yielded an impressive global accuracy, it ultimately failed the core risk parameter, missing 45% of actual attrition events. XGBoost struck the optimal commercial threshold, capturing 71% of churning customers while maintaining a significantly tighter precision boundary (52%) relative to the high-noise linear baseline.</p>
 
 								<div class="image main">
-									<img src="images/roc-curve-comparison.png" alt="ROC Curve Performance Comparison Chart" />
-									<p style="text-align: center; font-style: italic; font-size: 0.85rem; margin-top: 0.5rem;">Figure 1: ROC Curve space validation across candidate modeling pipelines.</p>
+									<img src="images/eval_plots.png" alt="ROC Curve Performance Comparison Chart" />
+									<p style="text-align: center; font-style: italic; font-size: 0.85rem; margin-top: 0.5rem;">Figure 1: ROC Curve space validation across candidate modelling pipelines.</p>
 								</div>
 
 								<hr />
 
 								<h2>2. Feature Engineering & Macroeconomic Transmission</h2>
-								<p>A continuous macroeconomic historical timeline (2010–2026) was reconstructed from wide-format national wage datasets using linear interpolation and automated CAGR projection metrics. Customer profiles were then matched against historical baselines according to their unique tenure cohorts to extract a normalized <code>purchasing_power_index</code>.</p>
+								<p>A continuous macroeconomic historical timeline (2010–2026) was reconstructed from wide-format national wage datasets using linear interpolation and automated CAGR projection metrics. Customer profiles were then matched against historical baselines according to their unique tenure cohorts to extract a normalised <code>purchasing_power_index</code>.</p>
 
 								<div class="image main">
-									<img src="images/xgboost-feature-importance.png" alt="XGBoost Feature Importance Gini Score Plot" />
+									<img src="images/feature_importance.png" alt="XGBoost Feature Importance Score Plot" />
 									<p style="text-align: center; font-style: italic; font-size: 0.85rem; margin-top: 0.5rem;">Figure 2: Information gain metrics isolating the global drivers of customer attrition.</p>
 								</div>
 
-								<p>Extracting the global feature importance rankings reveals that external financial indicators act as critical transmission channels for consumer flight. When localized living costs inflate, customer disposable cash buffers compress, driving immediate sensitivity towards competitor pricing parameters and product runoff.</p>
+								<p>Extracting the global feature importance rankings reveals that external financial indicators act as critical transmission channels for consumer flight. When localised living costs inflate, customer disposable cash buffers compress, driving immediate sensitivity towards competitor pricing parameters and product runoff.</p>
 
 								<hr />
 
 								<h2>3. Financial Strategic Impact</h2>
-								<p>To translate raw classification performance into quantifiable revenue management, the holdout confusion matrix outputs were passed into a strategic balance sheet simulation utilizing industry-standard retail banking parameters:</p>
+								<p>To translate raw classification performance into quantifiable revenue management, the holdout confusion matrix outputs were passed into a strategic balance sheet simulation utilising industry-standard retail banking parameters:</p>
 								
 								<ul>
 									<li><strong>Average Annual Account Asset Value:</strong> $500</li>
@@ -120,7 +120,7 @@
 									<li><strong>Targeted Incentive Conversion Rate:</strong> 50%</li>
 								</ul>
 
-								<p>By leveraging XGBoost to capture risk groups proactively rather than reacting post-attrition, the framework minimizes costly False Negatives. The marginal operational cost of distributing loyalty discounts to False Positive accounts is structurally outweighed by the capital assets protected, generating significant net portfolio value over baseline strategies.</p>
+								<p>By leveraging XGBoost to capture risk groups proactively rather than reacting post-attrition, the framework minimises costly False Negatives. The marginal operational cost of distributing loyalty discounts to False Positive accounts is structurally outweighed by the capital assets protected, generating significant net portfolio value over baseline strategies.</p>
 
 							</section>
 					</div>
